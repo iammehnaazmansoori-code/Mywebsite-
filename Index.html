@@ -1,0 +1,46 @@
+ // backend/server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// 1. Connect to MongoDB (Make sure you have MongoDB installed or use MongoDB Atlas)
+mongoose.connect('mongodb://localhost:27017/flipkart_clone', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log("Connected to DB"));
+
+// 2. Define Product Schema
+const productSchema = new mongoose.Schema({
+    name: String,
+    price: Number,
+    originalPrice: Number,
+    image: String,
+    rating: Number,
+    category: String
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+// 3. API Routes
+
+// Get all products
+app.get('/products', async (req, res) => {
+    const products = await Product.find();
+    res.json(products);
+});
+
+// Add a product (For testing)
+app.post('/products', async (req, res) => {
+    const newProduct = new Product(req.body);
+    await newProduct.save();
+    res.json(newProduct);
+});
+
+// Start Server
+app.listen(5000, () => {
+    console.log("Server running on port 5000");
+});
